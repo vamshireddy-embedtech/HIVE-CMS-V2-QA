@@ -1,0 +1,36 @@
+version: '3.1'
+services:
+  cmsapp:
+    image: 626690110339.dkr.ecr.us-east-1.amazonaws.com/cms-v2-onpremise:latest
+    environment:
+      SPRING_APPLICATION_JSON: '{
+        "spring.datasource.url"  : "jdbc:mysql://cms_database:3306/hive-cms-v2?useSSL=false",
+        "spring.datasource.username" : "root",
+        "spring.datasource.password" : "embedtech",
+        "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.MySQL5InnoDBDialect"
+      }'
+    ports:
+    - 9000:9000
+    working_dir: /opt/app
+    depends_on:
+    - cms_database
+    networks:
+    - cmsappnetwork
+  cms_database:
+    image: mysql:5.7
+    environment:
+    - MYSQL_ROOT_PASSWORD=embedtech
+    - MYSQL_DATABASE=hive-cms-v2
+    ports:
+    - 3306:3306
+    volumes:
+      - sqldb:/var/lib/mysql
+    restart: always
+    networks:
+    - cmsappnetwork
+volumes:
+  sqldb:
+    external: true
+networks:
+  cmsappnetwork:
+    external: true
